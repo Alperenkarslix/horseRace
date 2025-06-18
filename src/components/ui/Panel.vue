@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: 'Panel',
+  name: 'panelPage',
   props: {
     title: {
       type: String,

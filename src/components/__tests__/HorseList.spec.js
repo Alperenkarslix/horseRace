@@ -131,7 +131,7 @@ describe('HorseList.vue', () => {
   it('calls createHorses action when mounted with no horses', () => {
     const store = createVuexStore([]);
     const wrapper = mountComponent(store);
-    
+    console.log(wrapper.vm);
     expect(store.state.race.horses).toHaveLength(0);
     expect(store.actions.createHorses).toHaveBeenCalled();
   });

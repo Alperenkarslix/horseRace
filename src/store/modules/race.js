@@ -28,7 +28,7 @@ const mutations = {
   setPaused(state, value) {
     state.isPaused = value;
   },
-  updateProgress(state, { raceId }) {
+  updateProgress() {
   },
   updateRaceStatus(state, { raceId, status }) {
     const race = state.races.find(r => r.id === raceId);
