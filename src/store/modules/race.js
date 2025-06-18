@@ -1,14 +1,16 @@
-const DISTANCES = [1200, 1400, 1600, 1800, 2000, 2200];
-const SPEED = 200;
+import { RACE_DISTANCES, RACE_STATUS, BASE_SPEED, RACE_CONFIG } from '@/constants/race';
+import { HORSE_NAMES, HORSE_COLORS, HORSE_CONFIG } from '@/constants/horse';
 
-const state = {
+const getInitialState = () => ({
   horses: [],
   races: [],
   currentRace: null,
   results: [],
   isRunning: false,
   isPaused: false
-};
+});
+
+const state = getInitialState();
 
 const mutations = {
   setHorses(state, horses) {
@@ -27,7 +29,6 @@ const mutations = {
     state.isPaused = value;
   },
   updateProgress(state, { raceId }) {
-    // Reactive update için
   },
   updateRaceStatus(state, { raceId, status }) {
     const race = state.races.find(r => r.id === raceId);
@@ -35,35 +36,35 @@ const mutations = {
   },
   addResult(state, result) {
     state.results.push(result);
+  },
+  resetState(state) {
+    const freshState = getInitialState();
+    Object.keys(freshState).forEach(key => {
+      state[key] = freshState[key];
+    });
   }
 };
 
 const actions = {
   createHorses({ commit }) {
-    const names = [
-      'Lightning', 'Thunder', 'Storm', 'Fire', 'Wind', 'Star',
-      'Shadow', 'Flash', 'Spirit', 'Dream', 'Magic', 'Power',
-      'Speed', 'Rocket', 'Bullet', 'Arrow', 'Comet', 'Hero',
-      'Champion', 'Winner'
-    ];
-    
-    const colors = [
-      '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF',
-      '#00FFFF', '#800000', '#008000', '#000080', '#808000',
-      '#800080', '#008080', '#FFA500', '#FFC0CB', '#A52A2A',
-      '#808080', '#000000', '#F0F0F0', '#90EE90', '#FFB6C1'
-    ];
-    
     const horses = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < HORSE_CONFIG.TOTAL_HORSES; i++) {
       horses.push({
         id: i + 1,
-        name: names[i],
-        color: colors[i],
-        condition: Math.floor(Math.random() * 51) + 50
+        name: HORSE_NAMES[i],
+        color: HORSE_COLORS[i],
+        condition: Math.floor(Math.random() * HORSE_CONFIG.CONDITION_RANGE) + HORSE_CONFIG.MIN_CONDITION
       });
     }
     commit('setHorses', horses);
+  },
+
+  restart({ commit, dispatch }) {
+    commit('resetState');
+    commit('setCurrentRace', null);
+    setTimeout(() => {
+      dispatch('createProgram');
+    }, 0);
   },
 
   createProgram({ commit, state, dispatch }) {
@@ -72,18 +73,18 @@ const actions = {
     }
     
     const races = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < RACE_CONFIG.TOTAL_RACES; i++) {
       const shuffled = [...state.horses].sort(() => Math.random() - 0.5);
-      const selectedHorses = shuffled.slice(0, 10).map(horse => ({
+      const selectedHorses = shuffled.slice(0, RACE_CONFIG.HORSES_PER_RACE).map(horse => ({
         ...horse,
         progress: 0
       }));
       
       races.push({
         id: i + 1,
-        distance: DISTANCES[i],
+        distance: RACE_DISTANCES[i],
         horses: selectedHorses,
-        status: 'waiting'
+        status: RACE_STATUS.WAITING
       });
     }
     commit('setRaces', races);
@@ -98,69 +99,81 @@ const actions = {
       }
 
       commit('setCurrentRace', race);
-      commit('updateRaceStatus', { raceId, status: 'running' });
+      commit('updateRaceStatus', { raceId, status: RACE_STATUS.RUNNING });
 
       let finished = [];
-      const startTime = Date.now();
+      let startTime = Date.now();
+      let lastUpdateTime = Date.now();
+      let pauseStartTime = null;
+      let totalPausedTime = 0;
 
-      let lastUpdateTime = Date.now(); // İlk başlangıç zamanı tanımlanmalı (global veya üst scope)
-
-    const runRace = () => {
-      if (state.isPaused) {
-        setTimeout(runRace, 50);
-        return;
-      }
-
-      const now = Date.now();
-      const deltaTime = (now - lastUpdateTime) / 1000; // saniye cinsinden
-      lastUpdateTime = now;
-
-      let allFinished = true;
-
-      race.horses.forEach(horse => {
-        if (horse.progress >= 100) return;
-
-        const baseSpeed = SPEED * (horse.condition / 100); // m/s
-        const distancePerUpdate = baseSpeed * deltaTime;   // m
-        const progressIncrease = (distancePerUpdate / race.distance) * 100;
-
-        horse.progress += progressIncrease;
-
-        if (horse.progress >= 100) {
-          horse.progress = 100;
-
-          if (!finished.find(f => f.horse.id === horse.id)) {
-            const timeElapsed = (now - startTime) / 1000;
-            const position = finished.length + 1;
-
-            finished.push({
-              horse,
-              time: timeElapsed,
-              position
-            });
-
-            commit('addResult', {
-              raceId,
-              distance: race.distance,
-              horse,
-              time: timeElapsed,
-              position
-            });
+      const runRace = () => {
+        if (state.isPaused) {
+          if (!pauseStartTime) {
+            pauseStartTime = Date.now();
           }
-        } else {
-          allFinished = false;
+          setTimeout(runRace, RACE_CONFIG.UPDATE_INTERVAL);
+          return;
         }
-      });
 
-      commit('updateProgress', { raceId });
+        const now = Date.now();
 
-      if (!allFinished) {
-        setTimeout(runRace, 50);
-      } else {
-        commit('updateRaceStatus', { raceId, status: 'finished' });
-        resolve();
-      }
-    };
+        if (pauseStartTime) {
+          const pauseDuration = now - pauseStartTime;
+          totalPausedTime += pauseDuration;
+          lastUpdateTime = now;
+          pauseStartTime = null;
+        }
+
+        const deltaTime = (now - lastUpdateTime) / 1000;
+        lastUpdateTime = now;
+
+        let allFinished = true;
+
+        race.horses.forEach(horse => {
+          if (horse.progress >= 100) return;
+
+          const baseSpeed = BASE_SPEED * (horse.condition / 100);
+          const distancePerUpdate = baseSpeed * deltaTime;
+          const progressIncrease = (distancePerUpdate / race.distance) * 100;
+
+          horse.progress += progressIncrease;
+
+          if (horse.progress >= 100) {
+            horse.progress = 100;
+
+            if (!finished.find(f => f.horse.id === horse.id)) {
+              const effectiveTime = (now - startTime - totalPausedTime) / 1000;
+              const position = finished.length + 1;
+
+              finished.push({
+                horse,
+                time: effectiveTime,
+                position
+              });
+
+              commit('addResult', {
+                raceId,
+                distance: race.distance,
+                horse,
+                time: effectiveTime,
+                position
+              });
+            }
+          } else {
+            allFinished = false;
+          }
+        });
+
+        commit('updateProgress', { raceId });
+
+        if (!allFinished) {
+          setTimeout(runRace, RACE_CONFIG.UPDATE_INTERVAL);
+        } else {
+          commit('updateRaceStatus', { raceId, status: RACE_STATUS.FINISHED });
+          resolve();
+        }
+      };
 
       runRace();
     });

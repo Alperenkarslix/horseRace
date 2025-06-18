@@ -21,12 +21,9 @@ export default {
 
 <template>
   <div class="h-screen bg-gray-200">
-    <!-- Header -->
     <AppHeader />
 
-    <!-- Main Layout -->
     <main class="flex h-[calc(100vh-4rem)]">
-      <!-- Left - Horse List -->
       <Panel 
         class="w-1/5" 
         variant="secondary"
@@ -35,12 +32,10 @@ export default {
         <HorseList />
       </Panel>
 
-      <!-- Center - Race Track -->
       <div class="flex-1 bg-gray-300 p-4">
         <RaceTrack />
       </div>
 
-      <!-- Right - Program & Results -->
       <div class="w-2/5 flex">
         <Panel 
           class="flex-1" 
@@ -62,7 +57,6 @@ export default {
 </template>
 
 <style scoped>
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }

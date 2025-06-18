@@ -67,7 +67,6 @@ export default {
         grouped[result.raceId].positions.push(result);
       });
       
-      // Sort positions by position number
       Object.values(grouped).forEach(race => {
         race.positions.sort((a, b) => a.position - b.position);
       });

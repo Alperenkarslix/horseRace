@@ -1,26 +1,22 @@
 <template>
   <div class="h-full bg-gray-300 rounded-lg relative" ref="trackContainer">
-    <!-- Header -->
     <div class="absolute top-2 left-1/2 transform -translate-x-1/2">
       <h2 class="text-black text-lg font-bold">RACE TRACK</h2>
     </div>
 
     <div v-if="currentRace" class="h-full pt-8">
-      <!-- Track Lanes -->
       <div class="h-full flex flex-col justify-center space-y-1 px-4">
         <div
           v-for="(horse, index) in currentRace.horses"
           :key="horse.id"
           class="relative h-8 bg-green-500 border-t-2 border-b border-white"
         >
-          <!-- Lane Number -->
           <div class="absolute left-1 top-0 h-full flex items-center">
             <div class="w-6 h-6 bg-green-600 text-white text-xs font-bold rounded-sm flex items-center justify-center">
               {{ index + 1 }}
             </div>
           </div>
           
-          <!-- Track Lines -->
           <div class="absolute inset-0 ml-8 mr-4">
             <div class="absolute inset-0 flex">
               <div class="w-1/4 border-r border-white border-dashed opacity-60"></div>
@@ -30,7 +26,6 @@
             </div>
           </div>
           
-          <!-- Horse -->
           <div
             class="absolute top-0 h-full flex items-center transition-all duration-300 ease-out"
             :style="{ 
@@ -40,7 +35,6 @@
             <div class="text-black text-2xl">🐴</div>
           </div>
           
-          <!-- Horse Info -->
           <div class="absolute right-2 top-0 h-full flex items-center">
             <div class="text-xs text-white font-semibold bg-black bg-opacity-50 px-1 rounded">
               {{ horse.name }} {{ Math.round(horse.progress || 0) }}%
@@ -49,16 +43,13 @@
         </div>
       </div>
       
-      <!-- Finish Line -->
       <div class="absolute top-8 right-4 bottom-20 w-1 bg-red-600"></div>
       <div class="absolute top-8 right-2 bottom-20 w-1 bg-red-400"></div>
       
-      <!-- Finish Text -->
       <div class="absolute bottom-12 right-2 text-black font-bold text-sm bg-white bg-opacity-80 px-1 rounded">
         FINISH
       </div>
       
-      <!-- Distance Info -->
       <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-black font-bold text-sm">
         Race {{ currentRace.id }} - {{ currentRace.distance }}m
       </div>
@@ -81,7 +72,7 @@ export default {
   name: 'RaceTrack',
   data() {
     return {
-      containerWidth: 800 // Default value
+      containerWidth: 800
     };
   },
   computed: {
@@ -101,7 +92,7 @@ export default {
       }
     },
     getHorsePosition(progress) {
-      const startPos = 40; // Kulvar numarasından sonra başlangıç
+      const startPos = 40;
       const finishLineOffset = 40;
       const maxDistance = this.containerWidth - startPos - finishLineOffset;
       

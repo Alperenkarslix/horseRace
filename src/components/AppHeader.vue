@@ -3,16 +3,25 @@
     <h1 class="text-2xl font-bold">Horse Racing</h1>
     <div class="flex space-x-4">
       <BaseButton 
+        v-if="!isRunning"
         @click="generateProgram"
         variant="secondary"
       >
         GENERATE PROGRAM
       </BaseButton>
       <BaseButton 
+        v-if="!allRacesFinished"
         @click="toggleRaces"
         :variant="buttonVariant"
       >
         {{ buttonText }}
+      </BaseButton>
+      <BaseButton
+        v-if="allRacesFinished"
+        @click="restartGame"
+        variant="success"
+      >
+        RESTART
       </BaseButton>
     </div>
   </header>
@@ -28,7 +37,7 @@ export default {
     BaseButton
   },
   computed: {
-    ...mapGetters('race', ['isRunning', 'isPaused']),
+    ...mapGetters('race', ['isRunning', 'isPaused', 'allRaces']),
     buttonText() {
       if (!this.isRunning) return 'START RACES';
       return this.isPaused ? 'RESUME' : 'PAUSE';
@@ -36,6 +45,9 @@ export default {
     buttonVariant() {
       if (!this.isRunning) return 'success';
       return this.isPaused ? 'warning' : 'danger';
+    },
+    allRacesFinished() {
+      return this.allRaces.length > 0 && this.allRaces.every(race => race.status === 'finished');
     }
   },
   methods: {
@@ -44,6 +56,9 @@ export default {
     },
     toggleRaces() {
       this.$store.dispatch('race/togglePause');
+    },
+    restartGame() {
+      this.$store.dispatch('race/restart');
     }
   }
 };
