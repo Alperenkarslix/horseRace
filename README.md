@@ -109,6 +109,7 @@ npx playwright install
 npm run test:e2e
 # or
 yarn test:e2e
+```
 
 ## 🛠️ Built With
 
