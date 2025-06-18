@@ -2,22 +2,11 @@
 
 A real-time horse racing simulation game built with Vue 3, Vuex, and Tailwind CSS.
 
+## 🎮 Live Demo
+
+Experience the excitement of horse racing! Try out our live demo:
+
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Click_Here-blue?style=for-the-badge)](https://alperenkarslix.github.io/horseRace/)
-
-![Vue.js](https://img.shields.io/badge/Vue.js-3.0-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)
-![Vuex](https://img.shields.io/badge/Vuex-4.0-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-
-## ✨ Features
-
-- 🎮 Real-time horse racing simulation
-- 🎨 Modern UI with Tailwind CSS
-- 📊 Live race progress tracking
-- 🏆 Real-time results and rankings
-- 🔄 Multiple races with different distances
-- 🎯 Horse condition system (50-100%)
-- ⏯️ Pause/Resume functionality
-- 📱 Responsive design
 
 ## 🚀 Quick Start
 
@@ -74,6 +63,52 @@ src/
 │   └── modules/       # Store modules
 └── assets/            # Static assets
 ```
+
+## 🧪 Unit Tests
+
+The project includes comprehensive unit tests to ensure code reliability and maintainability. Vitest is used as the testing framework.
+
+Test coverage includes:
+- Component Tests
+  - AppHeader
+  - HorseList
+  - RaceResults
+  - RaceSchedule
+  - RaceTrack
+- Store Tests
+  - Race Module
+
+To run the tests:
+```bash
+npm run test
+# or
+yarn test
+```
+
+## 🎭 Visual Testing (E2E)
+
+End-to-end and visual testing is implemented using Playwright to ensure the application works correctly across different browsers and scenarios.
+
+Test scenarios include:
+- **Initial State**: Game title and UI elements visibility
+- **Race Program Generation**: Correct race creation and status updates
+- **Race Execution**: Race track functionality and horse animations
+- **Basic Functionality**: Page reload handling and state persistence
+
+Cross-browser testing support:
+- Chromium
+- Firefox
+- WebKit
+
+To run visual tests:
+```bash
+# Install Playwright browsers (first time only)
+npx playwright install
+
+# Run all E2E tests
+npm run test:e2e
+# or
+yarn test:e2e
 
 ## 🛠️ Built With
 

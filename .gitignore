@@ -18,6 +18,12 @@ coverage
 # Testing
 /cypress/videos/
 /cypress/screenshots/
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+# Vitest
+coverage/
 
 # Editor directories and files
 .vscode
