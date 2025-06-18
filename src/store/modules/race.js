@@ -209,10 +209,10 @@ const actions = {
 const getters = {
   allHorses: state => state.horses,
   allRaces: state => state.races,
-  currentRace: state => state.currentRace,
-  allResults: state => state.results,
   isRunning: state => state.isRunning,
-  isPaused: state => state.isPaused
+  isPaused: state => state.isPaused,
+  currentRace: state => state.currentRace,
+  results: state => state.results
 };
 
 export default {

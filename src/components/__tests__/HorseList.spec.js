@@ -1,12 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createStore } from 'vuex';
 import HorseList from '../HorseList.vue';
+import HorseItem from '../ui/HorseItem.vue';
 import { HORSE_CONFIG } from '@/constants/horse';
 
 describe('HorseList.vue', () => {
-  const createStore = (horses = []) => {
-    return createStore({
+  const createVuexStore = (horses = []) => {
+    const actions = {
+      createHorses: vi.fn()
+    };
+
+    const store = createStore({
       modules: {
         race: {
           namespaced: true,
@@ -14,22 +19,37 @@ describe('HorseList.vue', () => {
             horses
           },
           getters: {
-            horses: state => state.horses
-          }
+            allHorses: state => state.horses
+          },
+          actions
+        }
+      }
+    });
+
+    // Expose actions for testing
+    store.actions = actions;
+
+    return store;
+  };
+
+  const mountComponent = (store) => {
+    return mount(HorseList, {
+      global: {
+        plugins: [store],
+        components: {
+          HorseItem
         }
       }
     });
   };
 
   it('displays empty state when no horses', () => {
-    const store = createStore([]);
-    const wrapper = mount(HorseList, {
-      global: {
-        plugins: [store]
-      }
-    });
+    const store = createVuexStore([]);
+    const wrapper = mountComponent(store);
 
-    expect(wrapper.text()).toContain('No horses available');
+    const emptyState = wrapper.find('[data-test="empty-state"]');
+    expect(emptyState.exists()).toBe(true);
+    expect(emptyState.text()).toBe('No horses available');
   });
 
   it('displays correct number of horses', () => {
@@ -40,14 +60,10 @@ describe('HorseList.vue', () => {
       condition: 50
     }));
 
-    const store = createStore(horses);
-    const wrapper = mount(HorseList, {
-      global: {
-        plugins: [store]
-      }
-    });
+    const store = createVuexStore(horses);
+    const wrapper = mountComponent(store);
 
-    const horseItems = wrapper.findAll('.horse-item');
+    const horseItems = wrapper.findAll('[data-test="horse-item"]');
     expect(horseItems).toHaveLength(HORSE_CONFIG.TOTAL_HORSES);
   });
 
@@ -59,15 +75,64 @@ describe('HorseList.vue', () => {
       condition: 75
     };
 
-    const store = createStore([horse]);
-    const wrapper = mount(HorseList, {
-      global: {
-        plugins: [store]
-      }
-    });
+    const store = createVuexStore([horse]);
+    const wrapper = mountComponent(store);
 
-    const horseItem = wrapper.find('.horse-item');
+    const horseItem = wrapper.find('[data-test="horse-item"]');
+    expect(horseItem.exists()).toBe(true);
     expect(horseItem.text()).toContain('Test Horse');
     expect(horseItem.text()).toContain('75%');
+    expect(horseItem.find('.horse-color').attributes('style')).toContain('background-color: rgb(255, 0, 0)');
+  });
+
+  it('updates horse list when store changes', async () => {
+    const store = createVuexStore([]);
+    const wrapper = mountComponent(store);
+
+    // Initial state
+    expect(wrapper.find('[data-test="empty-state"]').exists()).toBe(true);
+
+    // Add a horse
+    const newHorse = {
+      id: 1,
+      name: 'New Horse',
+      color: '#00FF00',
+      condition: 60
+    };
+
+    store.state.race.horses.push(newHorse);
+    await wrapper.vm.$nextTick();
+
+    const horseItem = wrapper.find('[data-test="horse-item"]');
+    expect(horseItem.exists()).toBe(true);
+    expect(horseItem.text()).toContain('New Horse');
+    expect(horseItem.text()).toContain('60%');
+  });
+
+  it('sorts horses by condition', async () => {
+    const horses = [
+      { id: 1, name: 'Horse 1', color: '#000000', condition: 30 },
+      { id: 2, name: 'Horse 2', color: '#000000', condition: 90 },
+      { id: 3, name: 'Horse 3', color: '#000000', condition: 60 }
+    ];
+
+    const store = createVuexStore(horses);
+    const wrapper = mountComponent(store);
+
+    const horseItems = wrapper.findAll('[data-test="horse-item"]');
+    const conditions = horseItems.map(item => {
+      const conditionText = item.find('.text-xs').text();
+      return parseInt(conditionText);
+    });
+    
+    expect(conditions).toEqual([90, 60, 30]);
+  });
+
+  it('calls createHorses action when mounted with no horses', () => {
+    const store = createVuexStore([]);
+    const wrapper = mountComponent(store);
+    
+    expect(store.state.race.horses).toHaveLength(0);
+    expect(store.actions.createHorses).toHaveBeenCalled();
   });
 }); 

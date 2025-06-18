@@ -6,6 +6,7 @@
         v-if="!isRunning"
         @click="generateProgram"
         variant="secondary"
+        data-test="generate-program"
       >
         GENERATE PROGRAM
       </BaseButton>
@@ -13,6 +14,7 @@
         v-if="!allRacesFinished"
         @click="toggleRaces"
         :variant="buttonVariant"
+        data-test="toggle-pause"
       >
         {{ buttonText }}
       </BaseButton>
@@ -20,6 +22,7 @@
         v-if="allRacesFinished"
         @click="restartGame"
         variant="success"
+        data-test="restart"
       >
         RESTART
       </BaseButton>

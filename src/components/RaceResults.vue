@@ -5,6 +5,7 @@
         v-for="(result, index) in groupedResults"
         :key="index"
         class="bg-white rounded p-2 border border-green-300"
+        data-test="result-item"
       >
         <h3 class="font-semibold text-sm mb-2 text-center bg-orange-400 text-white py-1 rounded">
           Race {{ result.raceId }} ({{ result.distance }}m)
@@ -34,14 +35,13 @@
       </div>
     </div>
     
-    <div v-else class="h-full flex items-center justify-center">
+    <div v-else class="h-full flex items-center justify-center" data-test="empty-state">
       <div class="text-center text-green-700">
         <div class="text-2xl mb-2">🏁</div>
         <div class="text-sm font-medium">No Results Yet</div>
       </div>
     </div>
   </div>
-  
 </template>
 
 <script>
@@ -50,10 +50,7 @@ import { mapGetters } from 'vuex';
 export default {
   name: 'RaceResults',
   computed: {
-    ...mapGetters('race', ['allResults']),
-    results() {
-      return this.allResults;
-    },
+    ...mapGetters('race', ['results']),
     groupedResults() {
       const grouped = {};
       this.results.forEach(result => {

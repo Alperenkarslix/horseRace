@@ -5,75 +5,77 @@ import RaceSchedule from '../RaceSchedule.vue';
 import { RACE_STATUS } from '@/constants/race';
 
 describe('RaceSchedule.vue', () => {
-  const createStore = (races = []) => {
+  const createVuexStore = (races = []) => {
     return createStore({
       modules: {
         race: {
           namespaced: true,
           state: {
-            races
+            races,
+            isPaused: false
           },
           getters: {
-            allRaces: state => state.races
+            allRaces: state => state.races,
+            isPaused: state => state.isPaused
           }
         }
       }
     });
   };
 
-  it('displays empty state when no races', () => {
-    const store = createStore([]);
-    const wrapper = mount(RaceSchedule, {
+  const mountComponent = (store) => {
+    return mount(RaceSchedule, {
       global: {
         plugins: [store]
       }
     });
+  };
+
+  it('displays empty state when no races', () => {
+    const store = createVuexStore([]);
+    const wrapper = mountComponent(store);
 
     expect(wrapper.text()).toContain('No races scheduled');
   });
 
   it('displays race details correctly', () => {
-    const races = [{
-      id: 1,
-      distance: 1200,
-      status: RACE_STATUS.WAITING,
-      horses: [
-        { id: 1, name: 'Horse 1', condition: 75 },
-        { id: 2, name: 'Horse 2', condition: 80 }
-      ]
-    }];
-
-    const store = createStore(races);
-    const wrapper = mount(RaceSchedule, {
-      global: {
-        plugins: [store]
+    const races = [
+      {
+        id: 1,
+        distance: 1000,
+        horses: [
+          { id: 1, name: 'Horse 1', color: '#FF0000' },
+          { id: 2, name: 'Horse 2', color: '#00FF00' }
+        ],
+        status: RACE_STATUS.WAITING
       }
-    });
+    ];
 
-    const raceItem = wrapper.find('.race-item');
+    const store = createVuexStore(races);
+    const wrapper = mountComponent(store);
+
+    const raceItem = wrapper.find('[data-test="race-item"]');
+    expect(raceItem.exists()).toBe(true);
     expect(raceItem.text()).toContain('Race 1');
-    expect(raceItem.text()).toContain('1200m');
+    expect(raceItem.text()).toContain('1000m');
     expect(raceItem.text()).toContain('Horse 1');
     expect(raceItem.text()).toContain('Horse 2');
   });
 
   it('displays correct status indicators', () => {
     const races = [
-      { id: 1, distance: 1200, status: RACE_STATUS.WAITING, horses: [] },
-      { id: 2, distance: 1400, status: RACE_STATUS.RUNNING, horses: [] },
-      { id: 3, distance: 1600, status: RACE_STATUS.FINISHED, horses: [] }
+      { id: 1, distance: 1000, horses: [], status: RACE_STATUS.WAITING },
+      { id: 2, distance: 1200, horses: [], status: RACE_STATUS.RUNNING },
+      { id: 3, distance: 1400, horses: [], status: RACE_STATUS.FINISHED }
     ];
 
-    const store = createStore(races);
-    const wrapper = mount(RaceSchedule, {
-      global: {
-        plugins: [store]
-      }
-    });
+    const store = createVuexStore(races);
+    const wrapper = mountComponent(store);
 
-    const statuses = wrapper.findAll('.race-status');
-    expect(statuses[0].text()).toContain('Waiting');
-    expect(statuses[1].text()).toContain('Running');
-    expect(statuses[2].text()).toContain('Finished');
+    const statusIndicators = wrapper.findAll('[data-test="race-status"]');
+    expect(statusIndicators).toHaveLength(3);
+    expect(statusIndicators[0].text()).toBe('Waiting');
+    expect(statusIndicators[1].text()).toBe('Racing');
+    expect(statusIndicators[2].text()).toBe('Finished');
   });
 }); 

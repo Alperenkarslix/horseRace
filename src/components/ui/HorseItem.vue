@@ -1,14 +1,14 @@
 <template>
-  <div class="bg-white rounded p-2 shadow">
+  <div class="horse-item bg-white rounded p-2 border border-gray-300" data-test="horse-item">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <div 
-          class="w-4 h-4 rounded-full"
+          class="horse-color w-3 h-3 rounded-full"
           :style="{ backgroundColor: horse.color }"
         ></div>
         <span class="text-sm font-medium">{{ horse.name }}</span>
       </div>
-      <div class="text-xs text-gray-600">
+      <div class="text-xs font-medium" :class="getConditionClass(horse.condition)">
         {{ horse.condition }}%
       </div>
     </div>
@@ -30,6 +30,14 @@ export default {
     horse: {
       type: Object,
       required: true
+    }
+  },
+  methods: {
+    getConditionClass(condition) {
+      if (condition >= 80) return 'text-green-600';
+      if (condition >= 60) return 'text-blue-600';
+      if (condition >= 40) return 'text-yellow-600';
+      return 'text-red-600';
     }
   }
 };

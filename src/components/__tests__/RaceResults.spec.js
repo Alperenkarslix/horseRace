@@ -4,7 +4,7 @@ import { createStore } from 'vuex';
 import RaceResults from '../RaceResults.vue';
 
 describe('RaceResults.vue', () => {
-  const createStore = (results = []) => {
+  const createVuexStore = (results = []) => {
     return createStore({
       modules: {
         race: {
@@ -20,58 +20,70 @@ describe('RaceResults.vue', () => {
     });
   };
 
-  it('displays empty state when no results', () => {
-    const store = createStore([]);
-    const wrapper = mount(RaceResults, {
+  const mountComponent = (store) => {
+    return mount(RaceResults, {
       global: {
         plugins: [store]
       }
     });
+  };
 
-    expect(wrapper.text()).toContain('No results yet');
+  it('displays empty state when no results', () => {
+    const store = createVuexStore([]);
+    const wrapper = mountComponent(store);
+
+    const emptyState = wrapper.find('[data-test="empty-state"]');
+    expect(emptyState.exists()).toBe(true);
+    expect(emptyState.text()).toContain('No Results Yet');
   });
 
   it('displays race results correctly', () => {
-    const results = [{
-      raceId: 1,
-      distance: 1200,
-      horse: { id: 1, name: 'Winner Horse', condition: 85 },
-      time: 73.5,
-      position: 1
-    }];
-
-    const store = createStore(results);
-    const wrapper = mount(RaceResults, {
-      global: {
-        plugins: [store]
-      }
-    });
-
-    const resultItem = wrapper.find('.result-item');
-    expect(resultItem.text()).toContain('Race 1');
-    expect(resultItem.text()).toContain('1200m');
-    expect(resultItem.text()).toContain('Winner Horse');
-    expect(resultItem.text()).toContain('73.5');
-    expect(resultItem.text()).toContain('1st');
-  });
-
-  it('sorts results by race ID and position', () => {
     const results = [
-      { raceId: 1, distance: 1200, horse: { name: 'Horse A' }, time: 74.0, position: 2 },
-      { raceId: 1, distance: 1200, horse: { name: 'Horse B' }, time: 73.5, position: 1 },
-      { raceId: 2, distance: 1400, horse: { name: 'Horse C' }, time: 85.0, position: 1 }
+      {
+        raceId: 1,
+        distance: 1000,
+        horse: { id: 1, name: 'Horse 1', color: '#FF0000' },
+        time: 120,
+        position: 1
+      }
     ];
 
-    const store = createStore(results);
-    const wrapper = mount(RaceResults, {
-      global: {
-        plugins: [store]
-      }
-    });
+    const store = createVuexStore(results);
+    const wrapper = mountComponent(store);
 
-    const resultItems = wrapper.findAll('.result-item');
-    expect(resultItems[0].text()).toContain('Horse B');
-    expect(resultItems[1].text()).toContain('Horse A');
-    expect(resultItems[2].text()).toContain('Horse C');
+    const resultItem = wrapper.find('[data-test="result-item"]');
+    expect(resultItem.exists()).toBe(true);
+    expect(resultItem.text()).toContain('Race 1');
+    expect(resultItem.text()).toContain('1000m');
+    expect(resultItem.text()).toContain('Horse 1');
+    expect(resultItem.text()).toContain('120.00s');
+  });
+
+  it('sorts and groups results by race ID and position', () => {
+    const results = [
+      {
+        raceId: 1,
+        distance: 1000,
+        horse: { id: 1, name: 'Horse 1', color: '#FF0000' },
+        time: 120,
+        position: 2
+      },
+      {
+        raceId: 1,
+        distance: 1000,
+        horse: { id: 2, name: 'Horse 2', color: '#00FF00' },
+        time: 110,
+        position: 1
+      }
+    ];
+
+    const store = createVuexStore(results);
+    const wrapper = mountComponent(store);
+
+    const resultItems = wrapper.findAll('[data-test="result-item"]');
+    expect(resultItems).toHaveLength(1); // Should be grouped by race ID
+
+    const positions = wrapper.findAll('.w-4.h-4').map(el => el.text());
+    expect(positions).toEqual(['1', '2']);
   });
 }); 
