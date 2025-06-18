@@ -28,6 +28,16 @@ export default defineConfig([
     },
   },
 
+  // Node.js config files (Playwright, Vite, etc.)
+  {
+    files: ['*.config.js', '*.config.mjs', 'vitest.config.js', 'playwright.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
   skipFormatting,
