@@ -62,7 +62,15 @@ src/
 ├── store/             # Vuex store modules
 │   └── modules/       # Store modules
 └── assets/            # Static assets
-```
+``` 
+
+## ⚙️ GitHub Actions
+
+This project uses GitHub Actions for continuous integration and automated testing. The CI/CD pipeline helps maintain code quality and reliability through automated workflows.
+
+Every pull request and push to the main branch triggers these automated checks to keep the codebase stable and high-quality.
+
+![GitHub Actions Workflow](https://raw.githubusercontent.com/Alperenkarslix/horseRace/main/public/test_screenshot.png)
 
 ## 🧪 Unit Tests
 
