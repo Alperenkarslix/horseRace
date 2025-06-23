@@ -8,8 +8,7 @@
         data-test="result-item"
       >
         <h3 class="font-semibold text-xs md:text-sm mb-1 md:mb-2 text-center bg-orange-400 text-white py-0.5 md:py-1 rounded">
-          <span class="hidden sm:inline">Race {{ result.raceId }} ({{ result.distance }}m)</span>
-          <span class="sm:hidden">R{{ result.raceId }} - {{ result.distance }}m</span>
+          Race {{ result.raceId }} ({{ result.distance }}m)
         </h3>
         <div class="space-y-0.5 md:space-y-1">
           <div
@@ -19,7 +18,7 @@
             :class="getPositionClass(position.position)"
           >
             <div class="flex items-center space-x-1 md:space-x-2 flex-1 min-w-0">
-              <span class="w-3 h-3 md:w-4 md:h-4 flex items-center justify-center text-xs font-bold flex-shrink-0"
+              <span class="w-4 h-4 flex items-center justify-center text-xs font-bold flex-shrink-0"
                 :class="getPositionBadge(position.position)"
               >
                 {{ position.position }}
@@ -29,7 +28,7 @@
                 :style="{ backgroundColor: position.horse.color }"
               ></div>
               <span class="text-xs font-medium truncate">
-                {{ getMobileHorseName(position.horse.name) }}
+                {{ position.horse.name }}
               </span>
             </div>
             <span class="text-xs text-gray-600 flex-shrink-0 ml-1">
@@ -43,10 +42,7 @@
     <div v-else class="h-full flex items-center justify-center" data-test="empty-state">
       <div class="text-center text-green-700 px-4">
         <div class="text-xl md:text-2xl mb-1 md:mb-2">🏁</div>
-        <div class="text-xs md:text-sm font-medium">
-          <div class="md:hidden">No Results</div>
-          <div class="hidden md:block">No Results Yet</div>
-        </div>
+        <div class="text-xs md:text-sm font-medium">No Results Yet</div>
       </div>
     </div>
   </div>
@@ -92,9 +88,7 @@ export default {
       if (position === 3) return 'bg-orange-500 text-white rounded';
       return 'text-gray-600';
     },
-    getMobileHorseName(name) {
-      return window.innerWidth < 640 ? name.substring(0, 6) + (name.length > 6 ? '...' : '') : name;
-    }
+
   }
 };
 </script> 

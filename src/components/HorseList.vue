@@ -17,7 +17,7 @@
           ></div>
           <span class="text-xs md:text-sm font-medium truncate">{{ horse.name }}</span>
         </div>
-        <div class="text-xs font-medium flex-shrink-0" :class="getConditionClass(horse.condition)">
+        <div class="text-xs font-medium flex-shrink-0" :class="getConditionClass(horse.condition)" data-test="horse-condition">
           {{ horse.condition }}%
         </div>
       </div>

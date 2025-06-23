@@ -121,8 +121,14 @@ describe('HorseList.vue', () => {
 
     const horseItems = wrapper.findAll('[data-test="horse-item"]');
     const conditions = horseItems.map(item => {
-      const conditionText = item.find('.text-xs').text();
-      return parseInt(conditionText);
+      // Find the condition element using data-test attribute
+      const conditionElement = item.find('[data-test="horse-condition"]');
+      if (conditionElement.exists()) {
+        const text = conditionElement.text();
+        const match = text.match(/^(\d+)%$/);
+        return match ? parseInt(match[1]) : 0;
+      }
+      return 0;
     });
     
     expect(conditions).toEqual([90, 60, 30]);

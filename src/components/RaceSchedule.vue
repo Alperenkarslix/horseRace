@@ -7,7 +7,6 @@
       :class="getRaceClass(race.status)"
       data-test="race-item"
     >
-      <!-- Race Header - Responsive -->
       <div class="flex justify-between items-center mb-1 md:mb-1">
         <div>
           <h3 class="font-semibold text-xs md:text-sm">Race {{ race.id }}</h3>
@@ -18,12 +17,10 @@
           :class="getStatusClass(race.status)"
           data-test="race-status"
         >
-          <span class="hidden sm:inline">{{ getStatusText(race.status) }}</span>
-          <span class="sm:hidden">{{ getMobileStatusText(race.status) }}</span>
+          {{ getStatusText(race.status) }}
         </span>
       </div>
-      
-      <!-- Horses Grid - Responsive -->
+        
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-0.5 md:gap-1 text-xs">
         <div
           v-for="horse in race.horses"
@@ -34,7 +31,7 @@
             class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full flex-shrink-0"
             :style="{ backgroundColor: horse.color }"
           ></div>
-          <span class="text-xs truncate">{{ getMobileHorseName(horse.name) }}</span>
+          <span class="text-xs truncate">{{ horse.name }}</span>
         </div>
       </div>
     </div>
@@ -72,15 +69,6 @@ export default {
       if (status === 'running') return this.isPaused ? 'Paused' : 'Racing';
       if (status === 'finished') return 'Finished';
       return 'Waiting';
-    },
-    getMobileStatusText(status) {
-      if (status === 'running') return this.isPaused ? '⏸️' : '🏃';
-      if (status === 'finished') return '✅';
-      return '⏳';
-    },
-    getMobileHorseName(name) {
-      // Truncate horse names for mobile to save space
-      return window.innerWidth < 640 ? name.substring(0, 8) + (name.length > 8 ? '...' : '') : name;
     }
   }
 };

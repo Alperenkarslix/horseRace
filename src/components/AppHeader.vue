@@ -1,12 +1,7 @@
 <template>
   <header class="bg-red-400 text-white h-16 flex items-center justify-between px-3 md:px-6">
-    <!-- Title - Responsive -->
-    <h1 class="text-lg md:text-2xl font-bold truncate mr-2">
-      <span class="hidden sm:inline">Horse Racing</span>
-      <span class="sm:hidden">🏇 Racing</span>
-    </h1>
+    <h1 class="text-lg md:text-2xl font-bold truncate mr-2">Horse Racing</h1>
     
-    <!-- Button Group - Responsive -->
     <div class="flex space-x-1 md:space-x-4 flex-shrink-0">
       <BaseButton 
         v-if="!isRunning"
@@ -16,8 +11,7 @@
         data-test="generate-program"
         class="whitespace-nowrap"
       >
-        <span class="hidden sm:inline">GENERATE PROGRAM</span>
-        <span class="sm:hidden">🎲 GEN</span>
+        GENERATE PROGRAM
       </BaseButton>
       
       <BaseButton 
@@ -28,8 +22,7 @@
         data-test="toggle-pause"
         class="whitespace-nowrap"
       >
-        <span class="hidden sm:inline">{{ buttonText }}</span>
-        <span class="sm:hidden">{{ getMobileButtonText() }}</span>
+        {{ buttonText }}
       </BaseButton>
       
       <BaseButton
@@ -40,8 +33,7 @@
         data-test="restart"
         class="whitespace-nowrap"
       >
-        <span class="hidden sm:inline">RESTART</span>
-        <span class="sm:hidden">🔄</span>
+        RESTART
       </BaseButton>
     </div>
   </header>
@@ -70,8 +62,7 @@ export default {
       return this.allRaces.length > 0 && this.allRaces.every(race => race.status === 'finished');
     },
     buttonSize() {
-      // Mobile first approach - small buttons on mobile, medium on desktop
-      return 'sm';
+      return window.innerWidth < 768 ? 'sm' : 'md';
     }
   },
   methods: {
@@ -83,10 +74,6 @@ export default {
     },
     restartGame() {
       this.$store.dispatch('race/restart');
-    },
-    getMobileButtonText() {
-      if (!this.isRunning) return '▶️';
-      return this.isPaused ? '▶️' : '⏸️';
     }
   }
 };
