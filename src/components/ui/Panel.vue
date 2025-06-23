@@ -1,11 +1,12 @@
 <template>
-  <div class="overflow-y-auto" :class="[bgClass, 'p-4']">
+  <div class="overflow-y-auto" :class="[bgClass, 'p-2 md:p-4']">
     <h2 
       v-if="title"
-      class="text-lg font-bold mb-3 text-center py-2 rounded"
+      class="text-sm md:text-lg font-bold mb-2 md:mb-3 text-center py-1 md:py-2 rounded"
       :class="headerClass"
     >
-      {{ title }}
+      <span class="hidden md:inline">{{ title }}</span>
+      <span class="md:hidden">{{ getMobileTitle(title) }}</span>
     </h2>
     <slot />
   </div>
@@ -45,6 +46,17 @@ export default {
         warning: 'bg-orange-500 text-white'
       };
       return variants[this.variant];
+    }
+  },
+  methods: {
+    getMobileTitle(title) {
+      // Shorten titles for mobile display
+      const mobileMap = {
+        'Horse List (1-20)': '🐴 Horses',
+        'Program': '📋 Program',
+        'Results': '🏆 Results'
+      };
+      return mobileMap[title] || title;
     }
   }
 };

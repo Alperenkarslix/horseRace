@@ -1,27 +1,27 @@
 <template>
-  <div class="space-y-2">
+  <div class="space-y-1 md:space-y-2">
     <div v-if="sortedHorses.length === 0" data-test="empty-state" class="text-center text-gray-500 py-4">
       No horses available
     </div>
     <div
       v-for="horse in sortedHorses"
       :key="horse.id"
-      class="horse-item bg-white rounded p-2 border border-gray-300"
+      class="horse-item bg-white rounded p-1.5 md:p-2 border border-gray-300 hover:shadow-md transition-shadow"
       data-test="horse-item"
     >
       <div class="flex items-center justify-between mb-1">
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-1.5 md:space-x-2 flex-1 min-w-0">
           <div 
-            class="horse-color w-3 h-3 rounded-full"
+            class="horse-color w-2.5 h-2.5 md:w-3 md:h-3 rounded-full flex-shrink-0"
             :style="{ backgroundColor: horse.color }"
           ></div>
-          <span class="text-sm font-medium">{{ horse.name }}</span>
+          <span class="text-xs md:text-sm font-medium truncate">{{ horse.name }}</span>
         </div>
-        <div class="text-xs font-medium" :class="getConditionClass(horse.condition)">
+        <div class="text-xs font-medium flex-shrink-0" :class="getConditionClass(horse.condition)">
           {{ horse.condition }}%
         </div>
       </div>
-      <div class="h-1.5 bg-gray-200 rounded overflow-hidden">
+      <div class="h-1 md:h-1.5 bg-gray-200 rounded overflow-hidden">
         <div
           class="h-full rounded transition-all duration-300"
           :class="getProgressClass(horse.condition)"
