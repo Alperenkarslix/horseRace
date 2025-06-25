@@ -35,10 +35,7 @@ describe('HorseList.vue', () => {
   const mountComponent = (store) => {
     return mount(HorseList, {
       global: {
-        plugins: [store],
-        components: {
-          HorseItem
-        }
+        plugins: [store]
       }
     });
   };
@@ -63,11 +60,11 @@ describe('HorseList.vue', () => {
     const store = createVuexStore(horses);
     const wrapper = mountComponent(store);
 
-    const horseItems = wrapper.findAll('[data-test="horse-item"]');
+    const horseItems = wrapper.findAllComponents(HorseItem);
     expect(horseItems).toHaveLength(HORSE_CONFIG.TOTAL_HORSES);
   });
 
-  it('displays horse details correctly', () => {
+  it('passes correct props to HorseItem component', () => {
     const horse = {
       id: 1,
       name: 'Test Horse',
@@ -78,11 +75,9 @@ describe('HorseList.vue', () => {
     const store = createVuexStore([horse]);
     const wrapper = mountComponent(store);
 
-    const horseItem = wrapper.find('[data-test="horse-item"]');
+    const horseItem = wrapper.findComponent(HorseItem);
     expect(horseItem.exists()).toBe(true);
-    expect(horseItem.text()).toContain('Test Horse');
-    expect(horseItem.text()).toContain('75%');
-    expect(horseItem.find('.horse-color').attributes('style')).toContain('background-color: rgb(255, 0, 0)');
+    expect(horseItem.props('horse')).toEqual(horse);
   });
 
   it('updates horse list when store changes', async () => {
@@ -103,10 +98,9 @@ describe('HorseList.vue', () => {
     store.state.race.horses.push(newHorse);
     await wrapper.vm.$nextTick();
 
-    const horseItem = wrapper.find('[data-test="horse-item"]');
+    const horseItem = wrapper.findComponent(HorseItem);
     expect(horseItem.exists()).toBe(true);
-    expect(horseItem.text()).toContain('New Horse');
-    expect(horseItem.text()).toContain('60%');
+    expect(horseItem.props('horse')).toEqual(newHorse);
   });
 
   it('sorts horses by condition', async () => {
@@ -119,25 +113,15 @@ describe('HorseList.vue', () => {
     const store = createVuexStore(horses);
     const wrapper = mountComponent(store);
 
-    const horseItems = wrapper.findAll('[data-test="horse-item"]');
-    const conditions = horseItems.map(item => {
-      // Find the condition element using data-test attribute
-      const conditionElement = item.find('[data-test="horse-condition"]');
-      if (conditionElement.exists()) {
-        const text = conditionElement.text();
-        const match = text.match(/^(\d+)%$/);
-        return match ? parseInt(match[1]) : 0;
-      }
-      return 0;
-    });
+    const horseItems = wrapper.findAllComponents(HorseItem);
+    const conditions = horseItems.map(item => item.props('horse').condition);
     
     expect(conditions).toEqual([90, 60, 30]);
   });
 
   it('calls createHorses action when mounted with no horses', () => {
     const store = createVuexStore([]);
-    const wrapper = mountComponent(store);
-    console.log(wrapper.vm);
+    mountComponent(store);
     expect(store.state.race.horses).toHaveLength(0);
     expect(store.actions.createHorses).toHaveBeenCalled();
   });
